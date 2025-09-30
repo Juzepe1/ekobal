@@ -72,7 +72,6 @@
                         <page string="Details">
                             <field name="inventory_count_line_ids" readonly="status != 'draft'">
                                 <list editable="bottom">
-                                    <field name="product_id" required="1"/>
                                     <field name="internal_ref" readonly="1"/>
                                 </list>
                             </field>
