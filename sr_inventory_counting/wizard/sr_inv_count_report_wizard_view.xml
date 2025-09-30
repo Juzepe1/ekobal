@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form View for Inventory Session Report Wizard -->
+    <record id="view_inventory_count_report_line_wizard_form" model="ir.ui.view">
+        <field name="name">inventory.count.line.wizard.form</field>
+        <field name="model">sr.inv.count.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Count line Report">
+                <group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                    <group>
+                        <field name="approver_ids" widget="many2many_tags"
+                               options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="product_ids" widget="many2many_tags"
+                               options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="location_ids" widget="many2many_tags"
+                               options="{'no_create': True, 'no_create_edit': True}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_print_report" type="object" string="Print" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_inventory_count_report_wizard" model="ir.actions.act_window">
+        <field name="name">Inventory Count Report</field>
+        <field name="res_model">sr.inv.count.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

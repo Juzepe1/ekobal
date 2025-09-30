@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_inventory_counting_form" model="ir.ui.view">
+        <field name="name">view.sr.inventory.counting.form</field>
+        <field name="model">sr.inventory.counting</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_create_session" type="object" string="Create Session" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_approve_count" type="object" string="Approve Count" class="btn-primary"
+                            groups="sr_inventory_counting.group_inventory_approver"
+                            invisible="status != 'to_be_approve'"/>
+                    <button name="action_reject_count" type="object" string="Reject Count" class="btn-primary"
+                            invisible="status != 'to_be_approve'"/>
+                    <button name="action_send_for_approval" type="object" string="Send For Approval" class="btn-primary"
+                            invisible="status != 'in_progress'"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_create_adjustment" type="object" string="Create Adjustment" class="btn-primary"
+                            invisible="status != 'approved' or adjustment_create" groups="stock.group_stock_manager"/>
+                </header>
+
+                <sheet>
+                    <field name="session_count" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_show_created_session" type="object" class="oe_stat_button"
+                                icon="fa-clipboard" invisible="session_count &lt;= 0">
+                            <div class="o_field_startinfo">
+                                <span class="o_start_text"></span>
+                            </div>
+                            <field name="session_count" nolable="1" widget="statinfo"/>
+                        </button>
+
+                        <button name="action_open_adjustment" type="object" class="oe_stat_button" icon="fa-wrench"
+                                invisible="adjustment_count &lt;= 0" groups="stock.group_stock_manager">
+                            <div class="o_field_startinfo">
+                                <span class="o_start_text"></span>
+                                <field name="adjustment_count" nolable="1" widget="statinfo"/>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <span class="o_form_label" invisible="name != False" style="font-size:28px;">Draft</span>
+                        <h1 class="d-flex">
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="approver_id" required="1" options="{'no_create':True,'no_create_edit':True}"
+                                   readonly="status != 'draft'"
+                                   domain="[['groups_id', 'in', %(sr_inventory_counting.group_inventory_approver)d]]"/>
+                            <field name="warehouse_id" required="1"
+                                   options="{'no_create': True, 'no_create_edit': True}" readonly="status != 'draft'"/>
+                            <field name="location_id" required="1" options="{'no_create': True, 'no_create_edit': True}"
+                                   readonly="status != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date" required="1" readonly="status != 'draft'"/>
+                            <field name="type" widget='radio' options="{'horizontal':'true'}"
+                                   readonly="status != 'draft'"/>
+                            <field name="reject_reason"
+                                   invisible="status in ['draft','in_progress','cancel','approved']"
+                                   readonly="status != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <field name="inventory_count_line_ids" readonly="status != 'draft'">
+                                <list editable="bottom">
+                                    <field name="product_id" required="1"/>
+                                    <field name="internal_ref" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_inventory_counting_list" model="ir.ui.view">
+        <field name="name">view.sr.inventory.counting.list</field>
+        <field name="model">sr.inventory.counting</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" readonly="1"/>
+                <field name="date"/>
+                <field name="approver_id"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="type"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_inventory_counting_search" model="ir.ui.view">
+        <field name="name">sr.inventory.counting.search</field>
+        <field name="model">sr.inventory.counting</field>
+        <field name="arch" type="xml">
+            <search string="Inventory Counting">
+
+                <field name="name" string="Counting Name"/>
+                <filter string="Approvals" name="filter_my_approvals" domain="[('approver_id', '=', uid)]"/>
+                <filter string="Warehouse" name="filter_has_warehouse" domain="[('warehouse_id', '!=', False)]"/>
+                <filter string="Location" name="filter_has_location" domain="[('location_id', '!=', False)]"/>
+
+                <field name="approver_id"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="type"/>
+                <field name="date"/>
+                <field name="status"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Approver" name="group_by_user" context="{'group_by': 'approver_id'}"/>
+                    <filter string="Warehouse" name="group_by_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter string="Location" name="group_by_location" context="{'group_by': 'location_id'}"/>
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'type'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'date'}"/>
+                    <filter string="Status" name="group_by_date" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_inventory_counting" model="ir.actions.act_window">
+        <field name="name">Inventory Count</field>
+        <field name="res_model">sr.inventory.counting</field>
+        <field name="view_mode">list,form,search</field>
+    </record>
+
+    <menuitem id="menu_inventory_counting_root" name="Inventory Stock Count" parent="stock.menu_stock_warehouse_mgmt"
+              sequence="200"
+              groups="stock.group_stock_manager,sr_inventory_counting.group_inventory_approver,sr_inventory_counting.group_inventory_user"/>
+
+    <menuitem id="menu_inventory_counting"
+              name="Inventory Count"
+              parent="menu_inventory_counting_root"
+              action="action_inventory_counting"
+              sequence="1" groups="sr_inventory_counting.group_inventory_approver,stock.group_stock_manager"/>
+
+</odoo>

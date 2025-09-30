@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="sequence_inventory_adjustment" model="ir.sequence">
+        <field name="name">Inventory Adjustment</field>
+        <field name="code">sr.inv.adjustment</field>
+        <field name="prefix">INV/ADJ/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+    </record>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="module_category_sr_inventory_counting" model="ir.module.category">
+        <field name="name">Inventory Count</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="group_inventory_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="sr_inventory_counting.module_category_sr_inventory_counting"/>
+    </record>
+
+    <record id="group_inventory_approver" model="res.groups">
+        <field name="name">Approver</field>
+        <field name="category_id" ref="sr_inventory_counting.module_category_sr_inventory_counting"/>
+    </record>
+</odoo>
+
+

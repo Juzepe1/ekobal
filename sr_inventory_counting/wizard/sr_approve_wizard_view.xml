@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_sr_approve_wizard_form" model="ir.ui.view">
+        <field name="name">view.sr.approve.wizard.form</field>
+        <field name="model">sr.approve.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Approve Wizard">
+                <group>
+                    <field name="message" style="color:red; font-size:18px; font-weight:bold;" nolabel="1" readonly="1"
+                           widget="text"/>
+                </group>
+                <footer>
+                    <button string="Confirm" type="object" name="action_confirm_approve" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sr_approve_wizard" model="ir.actions.act_window">
+        <field name="name">Approve All Session Lines</field>
+        <field name="res_model">sr.approve.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

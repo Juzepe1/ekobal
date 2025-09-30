@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_sr_create_session_wizard_form" model="ir.ui.view">
+        <field name="name">sr.create.session.wizard.form</field>
+        <field name="model">sr.create.session.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Session Wizard">
+                <group>
+                    <group>
+                        <field name="user_id" required="1" options="{'no_create':True,'no_create_edit':True}"
+                               domain="[['groups_id', 'in', %(sr_inventory_counting.group_inventory_user)d]]"/>
+                        <field name="inventory_count_id" invisible="1"/>
+                    </group>
+                    <group></group>
+                </group>
+                <notebook>
+                    <page string="Product Lines">
+                        <field name="wizard_line_ids">
+                            <list editable="bottom" create="0" edit="0" delete="0">
+                                <field name="product_id" required="1"/>
+                                <field name="internal_ref" required="1"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                    <button string="Create Session" type="object" name="action_create_session" class="btn-primary"/>
+                    <button string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sr_create_session_wizard" model="ir.actions.act_window">
+        <field name="name">Create Session</field>
+        <field name="res_model">sr.create.session.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'active_ids': active_ids}</field>
+    </record>
+</odoo>

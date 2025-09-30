@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_inventory_session_form" model="ir.ui.view">
+        <field name="name">view.sr.inventory.session.form</field>
+        <field name="model">sr.inventory.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_approve_all_lines" type="object" string="Approve All Line" class="btn-primary"
+                            invisible="approved_all or status != 'done' or inventory_count_id.status in ['rejected','cancel']"
+                            groups="sr_inventory_counting.group_inventory_approver"/>
+                    <button name="action_reject_all" type="object" string="Reject All Line" class="btn-primary"
+                            invisible="reject_all or status != 'done' or inventory_count_id.status in ['rejected','cancel']"
+                            groups="sr_inventory_counting.group_inventory_approver"/>
+                    <button name="action_create_re_session"
+                            type="object"
+                            string="Re-Session"
+                            class="btn-primary"
+                            invisible="not rejected_line or re_session_created"/>
+
+                    <field name="timer_pause" invisible="1"/>
+                    <field name="display_timer_start_primary" invisible="1"/>
+                    <field name="display_timer_stop" invisible="1"/>
+                    <field name="display_timer_pause" invisible="1"/>
+                    <field name="display_timer_resume" invisible="1"/>
+                    <button class="btn-primary" name="action_session_start" type="object" string="Start Timer"
+                            invisible="status != 'draft' or inventory_count_id.status in ['cancel','rejected']"
+                            groups="sr_inventory_counting.group_inventory_user"/>
+                    <button class="btn-primary o_fsm_stop" name="action_session_stop" type="object" string="Stop Timer"
+                            invisible="not display_timer_stop" groups="sr_inventory_counting.group_inventory_user"/>
+                    <button class="btn-secondary" name="action_session_pause" type="object" string="Pause Timer"
+                            invisible="not display_timer_pause" groups="sr_inventory_counting.group_inventory_user"/>
+                    <button class="btn-secondary" name="action_session_resume" type="object" string="Resume Timer"
+                            invisible="not display_timer_resume" groups="sr_inventory_counting.group_inventory_user"/>
+                    <field name="timer_start" widget="timer_start_stop_field"
+                           class="d-flex align-self-center me-auto ms-2 h2"
+                           groups="sr_inventory_counting.group_inventory_user"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label" invisible="name != False" style="font-size:28px;">Draft</span>
+                        <h1 class="d-flex">
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="re_session_count" invisible="1"/>
+                        <button name="action_open_re_session" type="object" class="oe_stat_button" icon="fa-repeat"
+                                invisible="re_session_count &lt;= 0">
+                            <div class="o_field_startinfo">
+                                <span class="o_start_text">Re-Session</span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="inventory_count_id" readonly="1" required="1"/>
+                            <field name="user_id" required="1"
+                                   domain="[['groups_id', 'in', %(sr_inventory_counting.group_inventory_user)d]]"
+                                   readonly="1"/>
+                            <field name="approver_id" required="1"
+                                   domain="[['groups_id', 'in', %(sr_inventory_counting.group_inventory_approver)d]]"
+                                   readonly="1"/>
+                            <field name="warehouse_id" required="1"
+                                   options="{'no_create': True, 'no_create_edit': True}" readonly="1"/>
+                            <field name="location_id" required="1" options="{'no_create': True, 'no_create_edit': True}"
+                                   readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="is_re_session" invisible="1"/>
+                            <field name="date" required="1" readonly="1"/>
+                            <field name="type" widget='radio' options="{'horizontal':'true'}" readonly="1"/>
+                            <field name="total_product"/>
+                            <field name="original_session_id" invisible="is_re_session != True" readonly="1"/>
+                            <field name="timer_in_second" invisible="1"/>
+                            <field name="timer_in_char"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Details">
+                            <field name="session_line_ids">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="adjustment_done" column_invisible="1"/>
+                                    <field name="parent_status" column_invisible="1"/>
+                                    <field name="product_id" required="1"
+                                           readonly="inventory_session_id.status != 'draft'"/>
+                                    <field name="location_id" required="1"
+                                           options="{'no_create': True, 'no_create_edit': True}"
+                                           readonly="inventory_session_id.status != 'draft'"/>
+                                    <field name="counted_qty" readonly="parent_status != 'in_progress'"/>
+                                    <field name="status" readonly="1"/>
+                                    <field name="reject_reason" invisible="not show_reject_reason" optional="hide"
+                                           readonly="inventory_session_id.status != 'draft'"/>
+                                    <button name="action_approve_line" type="object" string="Approve"
+                                            invisible="parent_status != 'done'  or status != 'pending'"
+                                            groups="sr_inventory_counting.group_inventory_approver"/>
+                                    <button name="action_reject_line" type="object" string="Reject"
+                                            invisible="parent_status != 'done' or status != 'pending'"
+                                            groups="sr_inventory_counting.group_inventory_approver"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_inventory_session_list" model="ir.ui.view">
+        <field name="name">view.sr.inventory.session.list</field>
+        <field name="model">sr.inventory.session</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" readonly="1"/>
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="type"/>
+                <field name="total_product"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_inventory_session_kanban" model="ir.ui.view">
+        <field name="name">sr.inventory.session.kanban</field>
+        <field name="model">sr.inventory.session</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="o_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header mb-2">
+                                <strong>
+                                    <field name="name"/>
+                                </strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+
+                                <div style="width: 48%;">
+                                    <div>
+                                        <strong>User:</strong>
+                                        <field name="user_id"/>
+                                    </div>
+                                    <div>
+                                        <strong>Warehouse:</strong>
+                                        <field name="warehouse_id"/>
+                                    </div>
+                                    <div>
+                                        <strong>Location:</strong>
+                                        <field name="location_id"/>
+                                    </div>
+                                </div>
+
+                                <div style="width: 48%;">
+                                    <div>
+                                        <strong>Count:</strong>
+                                        <field name="inventory_count_id"/>
+                                    </div>
+                                    <div>
+                                        <strong>Date:</strong>
+                                        <field name="date"/>
+                                    </div>
+                                    <div>
+                                        <strong>Total Products:</strong>
+                                        <field name="total_product"/>
+                                    </div>
+                                    <div>
+                                        <strong>Status:</strong>
+                                        <field name="status"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_inventory_session_search" model="ir.ui.view">
+        <field name="name">sr.inventory.session.search</field>
+        <field name="model">sr.inventory.session</field>
+        <field name="arch" type="xml">
+            <search string="Inventory Sessions">
+
+                <field name="name" string="Session Name"/>
+
+                <filter string="Today" name="filter_today" domain="[('date', '=', context_today())]"/>
+                <filter string="This Week" name="filter_week"
+                        domain="[('date', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())))]"/>
+
+                <field name="user_id"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="type"/>
+                <field name="date"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="User" name="group_by_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Warehouse" name="group_by_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter string="Location" name="group_by_location" context="{'group_by': 'location_id'}"/>
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'type'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <record id="action_inventory_session" model="ir.actions.act_window">
+        <field name="name">Inventory Session</field>
+        <field name="res_model">sr.inventory.session</field>
+        <field name="view_mode">list,form,kanban,search</field>
+    </record>
+
+    <menuitem id="menu_inventory_session"
+              name="Inventory Session"
+              parent="menu_inventory_counting_root"
+              action="action_inventory_session"
+              sequence="2"
+              groups="sr_inventory_counting.group_inventory_user,sr_inventory_counting.group_inventory_approver,stock.group_stock_manager"/>
+</odoo>

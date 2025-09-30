@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_inv_count">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="page">
+                    <div>
+                        <center>
+                            <h1>Inventory Count Report</h1>
+                            <t t-if="start_date or end_date">
+                                <h4>
+                                    <t t-if="start_date and end_date">
+                                        Date From
+                                        <t t-esc="start_date"/>
+                                        to
+                                        <t t-esc="end_date"/>
+                                    </t>
+                                    <t t-elif="start_date">
+                                        Date From
+                                        <t t-esc="start_date"/>
+                                        to
+                                        <t t-esc="today"/>
+                                    </t>
+                                    <t t-elif="end_date">
+                                        Up to
+                                        <t t-esc="end_date"/>
+                                    </t>
+                                </h4>
+                            </t>
+                        </center>
+                    </div>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr style="background-color:#f2f2f2;">
+                                <th class="fw-bold text-center">Count Ref.</th>
+                                <th class="fw-bold text-center">Date</th>
+                                <th class="fw-bold text-center">Product</th>
+                                <th class="fw-bold text-center">Approver</th>
+                                <th class="fw-bold text-center">Location</th>
+                                <th class="fw-bold text-center">Type</th>
+                                <th class="fw-bold text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="lines" t-as="line">
+                                <tr>
+                                    <td>
+                                        <t t-esc="line['name']"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line['date']"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line['product_id']"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line['approver_id']"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line['location_id']"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line['type']"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line['status']"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_sr_inv_adjustment_form" model="ir.ui.view">
+        <field name="name">view.sr.inv.adjustment.form</field>
+        <field name="model">sr.inv.adjustment</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_adjustment_confirm" type="object" string="Confirm" class="btn btn-primary"
+                            invisible="status == 'done'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label" invisible="name != False" style="font-size:28px;">Draft</span>
+                        <h1 class="d-flex">
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="adjustment_line_count" invisible="1"/>
+                        <button name="action_adjustment_count_show" type="object" class="oe_stat_button"
+                                icon="fa-wrench" invisible="adjustment_line_count &lt;= 0">
+                            <div class="o_field_startinfo">
+                                <span class="o_start_text"/>
+                                <field name="adjustment_line_count" nolable="1" widget="statinfo"/>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="count_id" options="{'no_create': True, 'no_create_edit': True}" required="1"
+                                   readonly="status != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date" required="1" readonly="status != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Adjustment Line">
+                            <field name="sr_adjustment_line_ids" readonly="status != 'draft'">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="location_id" readonly="1"/>
+                                    <field name="counted_qty" readonly="1"/>
+                                    <field name="on_hand_qty" readonly="1"/>
+                                    <field name="difference" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_sr_inv_adjustment_list" model="ir.ui.view">
+        <field name="name">view.sr.inv.adjustment.list</field>
+        <field name="model">sr.inv.adjustment</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="count_id"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_sr_inv_adjustment_search" model="ir.ui.view">
+        <field name="name">view.sr.inv.adjustment.search</field>
+        <field name="model">sr.inv.adjustment</field>
+        <field name="arch" type="xml">
+            <search string="Inventory Adjustments">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="count_id"/>
+                <field name="status"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                    <filter string="Count" name="group_by_count" context="{'group_by': 'count_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_sr_inv_adjustment" model="ir.actions.act_window">
+        <field name="name">Inventory Adjustment</field>
+        <field name="res_model">sr.inv.adjustment</field>
+        <field name="view_mode">list,form,search</field>
+    </record>
+    <menuitem id="menu_sr_inv_adjustment" name="Inventory Adjustments" parent="menu_inventory_counting_root"
+              action="action_sr_inv_adjustment" sequence="3" groups="stock.group_stock_manager"/>
+</odoo>

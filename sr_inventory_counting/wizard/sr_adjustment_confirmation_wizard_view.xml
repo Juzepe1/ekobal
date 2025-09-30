@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_sr_adjustment_confirmation_wizard_form" model="ir.ui.view">
+        <field name="name">sr.adjustment.confirmation.wizard.form</field>
+        <field name="model">sr.adjustment.confirmation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Adjustment Confirmation" version="7">
+                <group>
+                    <field name="caution" readonly="1" nolabel="1"
+                           style="color:red; font-size:18px; font-weight:bold;"/>
+                </group>
+                <footer>
+                    <button name="action_ok" string="Ok" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sr_adjustment_confirmation_wizard" model="ir.actions.act_window">
+        <field name="name">Confirm Inventory Adjustment</field>
+        <field name="res_model">sr.adjustment.confirmation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
